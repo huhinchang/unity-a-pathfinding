@@ -43,9 +43,6 @@ public class AStarSolver : MonoBehaviour {
     [SerializeField] Tilemap tm;
     [SerializeField] TileBase wallTile;
     [SerializeField] Vector2Int mapSize;
-    [SerializeField] Vector2Int startPos;
-    [SerializeField] Vector2Int targetPos;
-    [SerializeField] int iterationGuard;
     Node[,] grid;
 
     // Start is called before the first frame update
@@ -57,26 +54,6 @@ public class AStarSolver : MonoBehaviour {
             }
         }
         RecalculateTraversable();
-    }
-
-    private void Update() {
-        if (Input.GetMouseButtonDown(0)) {
-            Debug.Log("querying pathfinder");
-            iterationGuard = 100;
-            Vector2 mousePos = (Vector2)Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            Vector2Int mousePosInt = new Vector2Int((int)mousePos.x, (int)mousePos.y);
-
-            Debug.DrawLine((Vector2)startPos, (Vector2)mousePosInt, Color.white, 1f);
-
-            Stack<Vector2Int> path = FindPath(startPos, mousePosInt);
-
-            Vector2Int prev = startPos;
-            while (path.Count > 0) {
-                //Debug.Log(path.Peek());
-                Debug.DrawLine((Vector2)prev + Vector2.one * 0.5f, (Vector2)path.Peek() + Vector2.one * 0.5f, Color.red, 1f);
-                prev = path.Pop();
-            }
-        }
     }
 
     public void RecalculateTraversable() {
@@ -130,9 +107,7 @@ public class AStarSolver : MonoBehaviour {
         grid[startPos.x, startPos.y].parent = grid[startPos.x, startPos.y];
 
         // assumes every tile is reachable (requires previous flood fill)
-        while (activeNodes.Count != 0 && iterationGuard > 0) {
-            --iterationGuard;
-
+        while (activeNodes.Count != 0) {
             activeNodes.Sort();
             Node current = activeNodes[0];
             activeNodes.RemoveAt(0);
@@ -140,8 +115,7 @@ public class AStarSolver : MonoBehaviour {
 
             if (current.pos == targetPos) {
                 Debug.Log("Target reached! generating path...");
-                while (current.pos != startPos && iterationGuard > 0) {
-                    --iterationGuard;
+                while (current.pos != startPos) {
                     path.Push(current.pos);
                     current = current.parent;
                 }
