@@ -69,30 +69,61 @@ public class AStarSolver : MonoBehaviour {
 
         Vector2Int pos = n.pos;
 
+        for (int dx = -1; dx <= 1; dx++) {
+            for (int dy = -1; dy <= 1; dy++) {
+                int candidateX = n.pos.x + dx;
+                int candidateY = n.pos.y + dy;
+                if (dx == 0 && dy == 0) {
+                    // same as n
+                    continue;
+                } else if (dx == 0 || dy == 0) {
+                    // orthogonal
+                    if (candidateX < mapSize.x && candidateY < mapSize.y && candidateX >= 0 && candidateY >= 0) {
+                        temp.Add(grid[candidateX, candidateY]);
+                    }
+                } else {
+                    // diagonal
+                    if (candidateX < mapSize.x && candidateY < mapSize.y && candidateX >= 0 && candidateY >= 0) {
+                        // no cutting corners
+                        if (grid[candidateX - dx, candidateY].traversable || grid[candidateX, candidateY - dy].traversable) {
+                            temp.Add(grid[candidateX, candidateY]);
+                        }
+                    }
+                }
+
+            }
+        }
+
+        /*
+
+        // right
         if (pos.x + 1 <= mapSize.x - 1) {
             temp.Add(grid[pos.x + 1, pos.y]);
         }
+        // up
         if (pos.y + 1 <= mapSize.y - 1) {
             temp.Add(grid[pos.x, pos.y + 1]);
         }
+        // left
         if (pos.x - 1 >= 0) {
             temp.Add(grid[pos.x - 1, pos.y]);
         }
+        // down
         if (pos.y - 1 >= 0) {
             temp.Add(grid[pos.x, pos.y - 1]);
         }
-
+        */
         return temp;
     }
 
     // returns a stack of vector2Ints, INCLUDING the start/endpoints
-    Stack<Vector2Int> FindPath(Vector2Int startPos, Vector2Int targetPos) {
+    public Stack<Vector2Int> FindPath(Vector2Int startPos, Vector2Int targetPos) {
 
         // reset info
         for (int x = 0; x < mapSize.x; x++) {
             for (int y = 0; y < mapSize.y; y++) {
                 grid[x, y].distFromStart = int.MaxValue;
-                grid[x, y].distToTarget = Mathf.Abs(x - targetPos.x) + Mathf.Abs(y - targetPos.y); // manhattan distance
+                grid[x, y].distToTarget = (Mathf.Abs(x - targetPos.x) + Mathf.Abs(y - targetPos.y)) * 10; // manhattan distance
                 //grid[x, y].distToTarget  = (int) Vector2.Distance(new Vector2(x,y), targetPos);
                 grid[x, y].parent = null;
             }
@@ -129,8 +160,9 @@ public class AStarSolver : MonoBehaviour {
                 // already visited, so move on to the next node
                 if (visitedNodes.Contains(n) || !n.traversable) { continue; }
 
+                // 10 if orthogonal, 14 if diagonal
+                int newDist = (n.pos.x == current.pos.x || n.pos.y == current.pos.y) ? current.distFromStart + 10 : current.distFromStart + 14;
                 // already in active list but we might've found a shorter path so double check
-                int newDist = current.distFromStart + 1;
                 if (!activeNodes.Contains(n) || newDist < n.distFromStart) {
                     n.parent = current;
                     n.distFromStart = newDist;
