@@ -117,7 +117,7 @@ public class AStarSolver : MonoBehaviour {
     }
 
     // returns a stack of vector2Ints, INCLUDING the start/endpoints
-    public Stack<Vector2Int> FindPath(Vector2Int startPos, Vector2Int targetPos) {
+    public List<Vector2Int> FindPath(Vector2Int startPos, Vector2Int targetPos) {
 
         // reset info
         for (int x = 0; x < mapSize.x; x++) {
@@ -129,7 +129,7 @@ public class AStarSolver : MonoBehaviour {
             }
         }
 
-        Stack<Vector2Int> path = new Stack<Vector2Int>();
+        List<Vector2Int> path = new List<Vector2Int>();
         // a priority queue is better but unity doesn't support .NET 6 i think
         List<Node> activeNodes = new List<Node>();
         List<Node> visitedNodes = new List<Node>();
@@ -147,10 +147,10 @@ public class AStarSolver : MonoBehaviour {
             if (current.pos == targetPos) {
                 Debug.Log("Target reached! generating path...");
                 while (current.pos != startPos) {
-                    path.Push(current.pos);
+                    path.Insert(0, current.pos);
                     current = current.parent;
                 }
-                path.Push(startPos);
+                path.Insert(0, startPos);
                 return path;
             }
 
