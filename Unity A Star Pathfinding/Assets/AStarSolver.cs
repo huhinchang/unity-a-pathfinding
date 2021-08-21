@@ -42,7 +42,7 @@ public class AStarSolver : MonoBehaviour {
     }
     [SerializeField] Tilemap tm;
     [SerializeField] TileBase wallTile;
-    [SerializeField] Vector2Int mapSize;
+    [SerializeField] public Vector2Int mapSize;
     Node[,] grid;
 
     // Start is called before the first frame update
@@ -178,16 +178,19 @@ public class AStarSolver : MonoBehaviour {
     }
 
     private void OnDrawGizmos() {
-        if (grid == null) { return; }
-        for (int x = 0; x < mapSize.x; x++) {
-            for (int y = 0; y < mapSize.y; y++) {
-                if (grid[x, y].traversable) {
-                    Gizmos.color = Color.white;
-                } else {
-                    Gizmos.color = Color.red;
+        if (grid == null) {
+            Gizmos.DrawWireCube(new Vector3(mapSize.x / 2, mapSize.y / 2), new Vector2(mapSize.x, mapSize.y));
+        } else {
+            for (int x = 0; x < mapSize.x; x++) {
+                for (int y = 0; y < mapSize.y; y++) {
+                    if (grid[x, y].traversable) {
+                        Gizmos.color = Color.white;
+                    } else {
+                        Gizmos.color = Color.red;
 
+                    }
+                    Gizmos.DrawWireCube(new Vector3(x + 0.5f, y + 0.5f), Vector3.one * 0.9f);
                 }
-                Gizmos.DrawWireCube(new Vector3(x + 0.5f, y + 0.5f), Vector3.one * 0.9f);
             }
         }
     }
